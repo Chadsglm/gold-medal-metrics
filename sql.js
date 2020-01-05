@@ -37,7 +37,10 @@ Returns a SQL query string that will find the number of gold medals for the give
 */
 
 const goldMedalNumber = country => {
-    return;
+  return `
+    SELECT COUNT(*) 
+    FROM GoldMedal WHERE country = '${country}';`
+  ;
 };
 
 /*
@@ -46,7 +49,12 @@ won the most summer medals, along with the number of medals aliased to 'count'.
 */
 
 const mostSummerWins = country => {
-  return;
+  return `SELECT year, count(season) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    AND season = 'Summer'
+    GROUP BY year
+    ORDER BY COUNT(*) DESC LIMIT 1;`
+  ;
 };
 
 /*
@@ -55,7 +63,12 @@ won the most winter medals, along with the number of medals aliased to 'count'.
 */
 
 const mostWinterWins = country => {
-  return;
+  return `SELECT year, count(season) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    AND season = 'Winter'
+    GROUP BY year
+    ORDER BY COUNT(*) DESC LIMIT 1;
+  `;
 };
 
 /*
@@ -64,7 +77,11 @@ won the most medals, along with the number of medals aliased to 'count'.
 */
 
 const bestYear = country => {
-  return;
+  return `SELECT year, count(*) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    GROUP BY year
+    ORDER BY count DESC LIMIT 1;
+  `;
 };
 
 /*
@@ -73,7 +90,11 @@ won the most medals, along with the number of medals aliased to 'count'.
 */
 
 const bestDiscipline = country => {
-  return;
+  return `SELECT discipline, count(discipline) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    GROUP BY discipline
+    ORDER BY count DESC LIMIT 1;
+  `;
 };
 
 /*
@@ -82,7 +103,11 @@ won the most medals, along with the number of medals aliased to 'count'.
 */
 
 const bestSport = country => {
-  return;
+  return `SELECT sport, count(sport) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    GROUP BY sport
+    ORDER BY count DESC LIMIT 1;
+  `;
 };
 
 /*
@@ -91,7 +116,11 @@ won the most medals, along with the number of medals aliased to 'count'.
 */
 
 const bestEvent = country => {
-  return;
+  return `SELECT event, count(event) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    GROUP BY event
+    ORDER BY count DESC LIMIT 1;
+  `;
 };
 
 /*
@@ -99,7 +128,10 @@ Returns a SQL query string that will find the number of male medalists.
 */
 
 const numberMenMedalists = country => {
-  return;
+  return `SELECT count(DISTINCT name)
+    FROM GoldMedal WHERE country = '${country}'
+    AND gender ='Men';
+  `;
 };
 
 /*
@@ -107,7 +139,10 @@ Returns a SQL query string that will find the number of female medalists.
 */
 
 const numberWomenMedalists = country => {
-  return;
+  return `SELECT count(DISTINCT name)
+    FROM GoldMedal WHERE country = '${country}'
+    AND gender ='Women';
+  `;
 };
 
 /*
@@ -115,7 +150,11 @@ Returns a SQL query string that will find the athlete with the most medals.
 */
 
 const mostMedaledAthlete = country => {
-  return;
+  return `SELECT name, count(name) AS count
+    FROM GoldMedal WHERE country = '${country}'
+    GROUP BY name
+    ORDER BY count DESC LIMIT 1;
+  `;
 };
 
 /*
@@ -124,7 +163,16 @@ optionally ordered by the given field in the specified direction.
 */
 
 const orderedMedals = (country, field, sortAscending) => {
-  return;
+  let orderBy = '';
+  if (field) {
+    if (sortAscending) {
+      orderBy = `ORDER BY ${field} ASC`
+    } else {
+      orderBy = `ORDER BY ${field} DESC`
+    }
+  }
+  return `SELECT * 
+    FROM GoldMedal WHERE country = '${country}' ${orderBy};`;
 };
 
 /*
@@ -135,7 +183,18 @@ aliased as 'percent'. Optionally ordered by the given field in the specified dir
 */
 
 const orderedSports = (country, field, sortAscending) => {
-  return;
+  let ordering = '';
+  if (field) {
+    if (sortAscending) {
+      ordering = `ORDER BY ${field} ASC`;
+    } else {
+      ordering = `ORDER BY ${field} DESC`;
+    }
+  }
+  return `SELECT sport, COUNT(sport) AS count, 
+    (COUNT(sport) * 100 / (select COUNT(*) FROM GoldMedal WHERE country = '${country}')) AS percent 
+    FROM GoldMedal WHERE country = '${country}' 
+    GROUP BY sport ${ordering};`;
 };
 
 module.exports = {
